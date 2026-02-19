@@ -11,8 +11,9 @@ WHERE `degrees`. `name` = 'Corso di Laurea in Economia'
 
 SELECT `degrees` . `name`, `departments`.`name` AS `dipartimento`
 FROM `degrees`
-JOIN `departments` ON `degrees`. `department_id` = `departments`. `id` 
-WHERE `departments`. `name` = 'Dipartimento di Neuroscienze' 
+JOIN `departments` ON `degrees`. `department_id` = `departments`. `id`
+WHERE `degrees`. `level` = 'magistrale' 
+AND `departments`. `name` = 'Dipartimento di Neuroscienze' 
 
 
 **********query 3 ********************
@@ -46,6 +47,13 @@ JOIN `course_teacher` ON `teachers`. `id` = `course_teacher`. `teacher_id`
 JOIN `courses` ON `course_teacher`. `course_id` = `courses`. `id`
 JOIN `degrees` ON `courses` . `degree_id` = `degrees` . `id`
 
+alternativa
+SELECT `degrees`.`name`, `courses`.`name`, `courses`.`period`, `courses`.`year`, `courses`.`cfu`, `teachers`.`name`, `teachers`.`surname` 
+FROM `degrees` 
+JOIN `courses` ON `degrees`.`id` = `courses`.`degree_id` 
+JOIN `course_teacher` ON `courses`.`id` = `course_teacher`.`course_id` 
+JOIN `teachers` ON `course_teacher`.`teacher_id` = `teachers`.`id`
+
 
 **********query 6 ********************
 --   Selezionare tutti i docenti che insegnano nel Dipartimento di Matematica (54)
@@ -57,3 +65,20 @@ JOIN `courses` ON `course_teacher`. `course_id`  = `courses`. `id`
 JOIN `degrees` ON `courses`. `degree_id`  = `degrees`. `id`
 JOIN `departments` ON `degrees`. `department_id`  = `departments`. `id`
 WHERE `departments`.`name`   = 'Dipartimento di Matematica'
+
+alternativa
+SELECT DISTINCT `teachers`.`name`, `teachers`.`surname`, `teachers`.`phone`, `teachers`.`email`, `teachers`.`office_address`, `teachers`.`office_number` 
+
+
+**********query 7 ********************
+BONUS: Selezionare per ogni studente il numero di tentativi sostenuti
+per ogni esame, stampando anche il voto massimo. Successivamente,
+filtrare i tentativi con voto minimo 18
+
+SELECT `students`.`id`, `students`.`name`, `students`.`surname`, `courses`.`name`, COUNT(`exam_student`.`vote`) AS `numero_tentativi`, MAX(`exam_student`.`vote`) AS `voto_massimo` 
+FROM `students` 
+JOIN `exam_student` ON `students`.`id` = `exam_student`.`student_id` 
+JOIN `exams` ON `exam_student`.`exam_id` = `exams`.`id` 
+JOIN `courses` ON `exams`.`course_id` = `courses`.`id` 
+GROUP BY `students`.`id`, `courses`.`id` 
+HAVING `voto_massimo` >= 18
